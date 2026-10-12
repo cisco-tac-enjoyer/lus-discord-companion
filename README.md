@@ -1,42 +1,59 @@
 # LUS Discord Companion
 
-A small Windows app that posts your World of Warcraft level-up screenshots to a Discord channel.
+Ein kleines Windows-Programm, das deine **World of Warcraft Level-up-Screenshots automatisch in einen Discord-Kanal postet**.
 
-It works together with the **LevelUpScreenshot** addon: the addon takes a screenshot in a separate file format (PNG by default) every time you level up, and the Companion watches your Screenshots folder and posts every new file in that format to a Discord webhook. Your normal screenshots (JPG) are never posted.
+So funktioniert es: Das Addon **[LevelUpScreenshot](https://www.curseforge.com/wow/addons/levelupscreenshot)** macht bei jedem Level-up einen Screenshot in einem eigenen Dateiformat (standardmäßig PNG). Der Companion beobachtet deinen Screenshots-Ordner und schickt jede neue Datei in diesem Format an Discord. Deine normalen Screenshots (JPG) werden nie gepostet.
 
-## Setup
+## Einrichtung
 
-1. **Install the addon** from CurseForge: *LevelUpScreenshot*.
-2. **Create a webhook** in Discord: channel settings → Integrations → Webhooks → New Webhook → Copy Webhook URL.
-3. **Start `lus-discord-companion.exe`** and fill in the fields:
-   - *Discord webhook URL*: paste the URL you copied.
-   - *Screenshots folder*: click **Auto-detect**, or **Browse…** to `World of Warcraft\_retail_\Screenshots` (or your Classic folder).
-   - *Bot name*: the name shown in Discord (no "discord" or "clyde").
-   - *Level-up format*: must match `/lus format` in game (PNG by default).
+1. **Addon installieren:** [LevelUpScreenshot auf CurseForge](https://www.curseforge.com/wow/addons/levelupscreenshot).
+2. **Webhook in Discord anlegen:** Kanal-Einstellungen → Integrationen → Webhooks → Neuer Webhook → Webhook-URL kopieren.
+3. **`lus-discord-companion.exe` starten** und die Felder ausfüllen:
+   - *Discord webhook URL*: die kopierte URL einfügen.
+   - *Screenshots folder*: **Auto-detect** klicken oder mit **Browse…** den Ordner `World of Warcraft\_retail_\Screenshots` (bzw. Classic) wählen.
+   - *Bot name*: der Name, der in Discord angezeigt wird (ohne „discord“ oder „clyde“).
+   - *Level-up format*: muss zu `/lus format` im Spiel passen (Standard: PNG).
 
-   Click **Send test message** to check the webhook, then **Save** and **▶ Start watching**.
+   Mit **Send test message** prüfen, ob es klappt. Danach **Save** und **▶ Start watching**.
+4. **Im Spiel testen:** `/lus test` eingeben. Nach wenigen Sekunden sollte der Screenshot in Discord erscheinen.
 
-   Windows SmartScreen may warn about the unsigned exe: click **More info → Run anyway**.
-4. **Test it**: type `/lus test` in game. The screenshot should appear in Discord within a few seconds.
+Mit **Start with Windows** startet das Programm nach dem Anmelden automatisch im Tray (unten rechts neben der Uhr) und legt gleich los.
 
-Tick **Start with Windows** to have the Companion start in the tray and watch automatically after login.
+> Windows warnt evtl. vor der unbekannten exe (SmartScreen): **Weitere Informationen → Trotzdem ausführen**.
 
-## Troubleshooting
+## Probleme?
 
-- **Nothing is posted**: check the Screenshots folder, and that the format dropdown matches `/lus format` in game.
-- **Every screenshot is posted**: your normal and level-up formats are the same. Change one of them (`/lus format png` or `/console screenshotFormat jpg`).
-- **"Webhook is invalid or was deleted"**: create a new webhook and paste the new URL.
+- **Es wird nichts gepostet:** Screenshots-Ordner prüfen, und ob das Format zu `/lus format` im Spiel passt.
+- **Jeder Screenshot wird gepostet:** Normales Format und Level-up-Format sind gleich. Eins davon ändern (`/lus format png` oder `/console screenshotFormat jpg`).
+- **„Webhook is invalid or was deleted“:** In Discord einen neuen Webhook anlegen und die neue URL eintragen.
 
-If you used an older version (*WoW LevelUp to Discord* or *LevelUpScreenshot Companion*), exit it first. Your settings are taken over automatically.
+## Gut zu wissen
 
-Settings, the posted-files list and the log are stored in `%APPDATA%\lus-discord-companion\`. The Companion never deletes or moves your screenshots.
+- Einstellungen, Liste der geposteten Bilder und Protokoll liegen in `%APPDATA%\lus-discord-companion\`. Der genaue Pfad steht im Programm unter *Config file*.
+- Einstellungen älterer Versionen (*WoW LevelUp to Discord*, *LevelUpScreenshot Companion*) werden automatisch übernommen. Die alte Version vorher beenden.
+- Deine Screenshots werden nie gelöscht oder verschoben.
+- Keine Installation nötig: Die exe ist eine einzelne Datei und läuft von überall.
 
-## Building
+## Für Entwickler
 
-Run `./build.ps1` on Windows. It compiles `dist/lus-discord-companion.exe` with the C# compiler that ships with Windows (.NET Framework 4.8, nothing to install). If the .NET SDK is installed, it also runs the tests.
+`./build.ps1` baut `dist\lus-discord-companion.exe` mit dem C#-Compiler, der in Windows enthalten ist (.NET Framework 4.8, nichts zu installieren). Ist das .NET SDK installiert, laufen zusätzlich die Tests.
 
-The exe is a single file and needs no installation: copy it anywhere and start it.
+```
+build.ps1                    Baut die exe nach dist\
+src/LusDiscordCompanion/
+  Program.cs                 Startpunkt; verhindert, dass die App doppelt läuft
+  app.manifest               Windows-Einstellungen der exe (scharfe Darstellung)
+  UI/                        Fenster und Tray-Icon
+  Discord/                   Senden an den Discord-Webhook
+  Screenshots/               Ordner beobachten, Bilder vorbereiten, Ordner finden,
+                             merken was schon gepostet wurde
+  Settings/                  Einstellungen laden/speichern, "Start with Windows"
+  Logging/                   Protokoll
+  Assets/                    Icon
+tests/                       Automatische Tests (nur mit .NET SDK)
+dist/                        Fertige exe (nicht in git)
+```
 
-## License
+## Lizenz
 
-MIT, see [LICENSE](LICENSE).
+MIT, siehe [LICENSE](LICENSE).

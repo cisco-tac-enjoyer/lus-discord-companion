@@ -28,6 +28,9 @@ namespace LusDiscordCompanion
         public bool MinimizeToTray { get; set; }
         public bool AutoStartWatching { get; set; }
 
+        // File the values were read from (settings.json or the legacy file), or null when defaults were used.
+        public string SourcePath { get; private set; }
+
         public AppSettings()
         {
             WebhookUrl = "";
@@ -75,6 +78,7 @@ namespace LusDiscordCompanion
             var values = ReadJson(path ?? DefaultPath);
             if (values != null)
             {
+                settings.SourcePath = path ?? DefaultPath;
                 settings.WebhookUrl = GetString(values, "webhookUrl", settings.WebhookUrl);
                 settings.ScreenshotsFolder = GetString(values, "screenshotsFolder", settings.ScreenshotsFolder);
                 settings.BotName = GetString(values, "botName", settings.BotName);
@@ -88,6 +92,7 @@ namespace LusDiscordCompanion
                 var legacy = ReadJson(LegacyPath);
                 if (legacy != null)
                 {
+                    settings.SourcePath = LegacyPath;
                     settings.WebhookUrl = Regex.Replace(GetString(legacy, "WebhookUrl", ""), @"\s", "");
                     settings.ScreenshotsFolder = GetString(legacy, "ScreenshotsFolder", "");
                 }

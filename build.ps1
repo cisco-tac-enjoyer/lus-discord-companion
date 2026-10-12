@@ -6,15 +6,15 @@ New-Item -ItemType Directory -Force dist | Out-Null
 # One .exe compiled with the C# compiler that ships with Windows (.NET Framework 4.8).
 $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 if (-not (Test-Path $csc)) { throw "csc.exe not found at $csc" }
-$src = 'lus-discord-companion'
+$src = 'src\LusDiscordCompanion'
 & $csc /nologo /target:winexe /optimize+ /utf8output `
-  "/win32icon:$src/Assets/app.ico" `
+  "/win32icon:$src\Assets\app.ico" "/win32manifest:$src\app.manifest" `
   /r:System.Net.Http.dll /r:System.Web.Extensions.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll `
-  /out:dist/lus-discord-companion.exe "$src/*.cs"
+  /out:dist/lus-discord-companion.exe "/recurse:$src\*.cs"
 if ($LASTEXITCODE -ne 0) { throw 'Compile failed' }
 
 if (Get-Command dotnet -ErrorAction SilentlyContinue) {
-  dotnet test lus-discord-companion.Tests
+  dotnet test tests/LusDiscordCompanion.Tests
   if ($LASTEXITCODE -ne 0) { throw 'Tests failed' }
 } else {
   Write-Host 'dotnet SDK not installed, skipping tests.'

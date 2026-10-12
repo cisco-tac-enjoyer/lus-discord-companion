@@ -21,6 +21,9 @@ namespace LusDiscordCompanion
         private Button btnTest;
         private Button btnWatch;
         private ListBox lstLog;
+        private TextBox txtConfigPath;
+        private Button btnOpenConfig;
+        private Panel adBanner;
         private NotifyIcon trayIcon;
         private ContextMenuStrip trayMenu;
         private ToolStripMenuItem trayOpen;
@@ -62,6 +65,9 @@ namespace LusDiscordCompanion
             btnTest = new Button();
             btnWatch = new Button();
             lstLog = new ListBox();
+            txtConfigPath = new TextBox();
+            btnOpenConfig = new Button();
+            adBanner = new Panel();
             trayIcon = new NotifyIcon(components);
             trayMenu = new ContextMenuStrip(components);
             trayOpen = new ToolStripMenuItem();
@@ -78,8 +84,8 @@ namespace LusDiscordCompanion
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-            layout.RowCount = 8;
-            for (int i = 0; i < 7; i++)
+            layout.RowCount = 9;
+            for (int i = 0; i < 8; i++)
                 layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
 
@@ -127,6 +133,16 @@ namespace LusDiscordCompanion
             layout.Controls.Add(formatRow, 1, 3);
             layout.SetColumnSpan(formatRow, 3);
 
+            txtConfigPath.Dock = DockStyle.Fill;
+            txtConfigPath.ReadOnly = true;
+            btnOpenConfig.Text = "Open folder";
+            btnOpenConfig.AutoSize = true;
+            btnOpenConfig.Click += BtnOpenConfig_Click;
+            layout.Controls.Add(FieldLabel("Config file"), 0, 4);
+            layout.Controls.Add(txtConfigPath, 1, 4);
+            layout.SetColumnSpan(txtConfigPath, 2);
+            layout.Controls.Add(btnOpenConfig, 3, 4);
+
             chkStartup.Text = "Start with Windows";
             chkStartup.AutoSize = true;
             chkTray.Text = "Minimize to tray";
@@ -135,7 +151,7 @@ namespace LusDiscordCompanion
             var optionsRow = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = new Padding(0, 10, 0, 6) };
             optionsRow.Controls.Add(chkStartup);
             optionsRow.Controls.Add(chkTray);
-            layout.Controls.Add(optionsRow, 0, 4);
+            layout.Controls.Add(optionsRow, 0, 5);
             layout.SetColumnSpan(optionsRow, 4);
 
             btnSave.Text = "Save";
@@ -151,18 +167,45 @@ namespace LusDiscordCompanion
             buttonRow.Controls.Add(btnSave);
             buttonRow.Controls.Add(btnTest);
             buttonRow.Controls.Add(btnWatch);
-            layout.Controls.Add(buttonRow, 0, 5);
+            layout.Controls.Add(buttonRow, 0, 6);
             layout.SetColumnSpan(buttonRow, 4);
 
             var activityLabel = FieldLabel("Activity");
-            layout.Controls.Add(activityLabel, 0, 6);
+            layout.Controls.Add(activityLabel, 0, 7);
             layout.SetColumnSpan(activityLabel, 4);
 
             lstLog.Dock = DockStyle.Fill;
             lstLog.IntegralHeight = false;
             lstLog.HorizontalScrollbar = true;
-            layout.Controls.Add(lstLog, 0, 7);
+            layout.Controls.Add(lstLog, 0, 8);
             layout.SetColumnSpan(lstLog, 4);
+
+            // Gimmick: fake ad banner along the bottom edge.
+            adBanner.Visible = false;
+            adBanner.Dock = DockStyle.Bottom;
+            adBanner.Height = 34;
+            adBanner.BackColor = Color.FromArgb(255, 214, 0);
+            adBanner.Padding = new Padding(6, 0, 6, 0);
+            var adTag = new Label
+            {
+                Text = "ANZEIGE",
+                Dock = DockStyle.Left,
+                AutoSize = false,
+                Width = 70,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Font = new Font("Segoe UI", 7F, FontStyle.Bold),
+                ForeColor = Color.FromArgb(120, 90, 0),
+            };
+            var adText = new Label
+            {
+                Text = "★ Hier könnte Ihre Werbung stehen ★",
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Font = new Font("Segoe UI", 10.5F, FontStyle.Bold),
+                ForeColor = Color.FromArgb(40, 30, 0),
+            };
+            adBanner.Controls.Add(adText);
+            adBanner.Controls.Add(adTag);
 
             trayOpen.Text = "Open";
             trayOpen.Click += (s, e) => ShowFromTray();
@@ -175,13 +218,15 @@ namespace LusDiscordCompanion
             trayIcon.ContextMenuStrip = trayMenu;
             trayIcon.DoubleClick += (s, e) => ShowFromTray();
 
-            AutoScaleMode = AutoScaleMode.Dpi;
             AutoScaleDimensions = new SizeF(96F, 96F);
-            ClientSize = new Size(760, 480);
-            MinimumSize = new Size(640, 400);
+            AutoScaleMode = AutoScaleMode.Dpi;
+            Font = SystemFonts.MessageBoxFont;
+            ClientSize = new Size(760, 510);
+            MinimumSize = new Size(640, 430);
             StartPosition = FormStartPosition.CenterScreen;
             Text = "LUS Discord Companion";
             Controls.Add(layout);
+            Controls.Add(adBanner);
             FormClosing += MainForm_FormClosing;
             Resize += MainForm_Resize;
 

@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\lus-discord-companion\*.cs" Exclude="..\lus-discord-companion\Program.cs" LinkBase="Companion" />
+    <Compile Include="..\..\src\LusDiscordCompanion\**\*.cs" Exclude="..\..\src\LusDiscordCompanion\Program.cs" LinkBase="Companion" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Drawing" />

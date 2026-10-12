@@ -34,6 +34,7 @@ namespace LusDiscordCompanion
 
             _settings = AppSettings.Load();
             LoadFields(_settings);
+            ShowConfigPath(_settings.SourcePath);
             if (_settings.StartWithWindows)
             {
                 try
@@ -106,6 +107,34 @@ namespace LusDiscordCompanion
             chkTray.Checked = s.MinimizeToTray;
         }
 
+        void ShowConfigPath(string loadedFrom)
+        {
+            if (loadedFrom == null)
+                txtConfigPath.Text = AppSettings.DefaultPath + "  (not saved yet)";
+            else if (loadedFrom != AppSettings.DefaultPath)
+                txtConfigPath.Text = loadedFrom + "  (old version, press Save to move it to " + AppSettings.DefaultPath + ")";
+            else
+                txtConfigPath.Text = loadedFrom;
+        }
+
+        void BtnOpenConfig_Click(object sender, EventArgs e)
+        {
+            var path = File.Exists(AppSettings.DefaultPath) ? AppSettings.DefaultPath : _settings.SourcePath;
+            try
+            {
+                if (path != null && File.Exists(path))
+                    System.Diagnostics.Process.Start("explorer.exe", "/select,\"" + path + "\"");
+                else
+                    System.Diagnostics.Process.Start("explorer.exe", "\"" + Directory.CreateDirectory(AppSettings.DataDir).FullName + "\"");
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is IOException || ex is UnauthorizedAccessException || ex is System.ComponentModel.Win32Exception))
+                    throw;
+                MessageBox.Show(this, "Could not open folder: " + ex.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         AppSettings ReadFields()
         {
             return new AppSettings
@@ -144,6 +173,7 @@ namespace LusDiscordCompanion
             }
 
             _settings = candidate;
+            ShowConfigPath(AppSettings.DefaultPath);
             _log.Write("Settings saved.");
             return true;
         }
@@ -252,6 +282,9 @@ namespace LusDiscordCompanion
         {
             using (var picker = new Form
             {
+                AutoScaleDimensions = new SizeF(96F, 96F),
+                AutoScaleMode = AutoScaleMode.Dpi,
+                Font = SystemFonts.MessageBoxFont,
                 Text = "Choose Screenshots folder",
                 StartPosition = FormStartPosition.CenterParent,
                 Size = new Size(560, 260),
