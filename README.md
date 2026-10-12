@@ -51,7 +51,7 @@ src/LusDiscordCompanion/
   Logging/                   Protokoll
   Assets/                    Icon
 tests/                       Automatische Tests (nur mit .NET SDK)
-dist/                        Fertige exe (nicht in git)
+dist/                        Fertige exe zum Herunterladen
 ```
 
 ## Lizenz
