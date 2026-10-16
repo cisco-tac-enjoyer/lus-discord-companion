@@ -21,6 +21,7 @@ namespace LusDiscordCompanion
         ScreenshotWatcher _watcher;
         bool _allowShow;
         bool _exiting;
+        bool _revertingOption;
 
         public MainForm(bool startMinimized)
         {
@@ -34,7 +35,10 @@ namespace LusDiscordCompanion
 
             _settings = AppSettings.Load();
             LoadFields(_settings);
+            chkStartup.CheckedChanged += ChkOptions_CheckedChanged;
+            chkTray.CheckedChanged += ChkOptions_CheckedChanged;
             ShowConfigPath(_settings.SourcePath);
+            txtExePath.Text = Application.ExecutablePath;
             if (_settings.StartWithWindows)
             {
                 try
@@ -133,6 +137,57 @@ namespace LusDiscordCompanion
                     throw;
                 MessageBox.Show(this, "Could not open folder: " + ex.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        void BtnOpenExe_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start("explorer.exe", "/select,\"" + Application.ExecutablePath + "\"");
+            }
+            catch (System.ComponentModel.Win32Exception ex)
+            {
+                MessageBox.Show(this, "Could not open folder: " + ex.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // The checkboxes stay usable while watching (when Save is disabled), so they are saved on change.
+        void ChkOptions_CheckedChanged(object sender, EventArgs e)
+        {
+            if (_revertingOption)
+                return;
+
+            var candidate = new AppSettings
+            {
+                WebhookUrl = _settings.WebhookUrl,
+                ScreenshotsFolder = _settings.ScreenshotsFolder,
+                BotName = _settings.BotName,
+                LevelUpFormat = _settings.LevelUpFormat,
+                StartWithWindows = chkStartup.Checked,
+                MinimizeToTray = chkTray.Checked,
+                AutoStartWatching = _settings.AutoStartWatching,
+            };
+
+            try
+            {
+                candidate.Save();
+                Autostart.Set(candidate.StartWithWindows);
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is IOException || ex is UnauthorizedAccessException || ex is SecurityException))
+                    throw;
+                MessageBox.Show(this, "Could not save settings: " + AppSettings.Redact(ex.Message), Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _revertingOption = true;
+                chkStartup.Checked = _settings.StartWithWindows;
+                chkTray.Checked = _settings.MinimizeToTray;
+                _revertingOption = false;
+                return;
+            }
+
+            _settings = candidate;
+            ShowConfigPath(AppSettings.DefaultPath);
+            _log.Write("Settings saved.");
         }
 
         AppSettings ReadFields()

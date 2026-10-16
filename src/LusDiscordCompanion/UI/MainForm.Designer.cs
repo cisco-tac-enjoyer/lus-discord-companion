@@ -23,6 +23,8 @@ namespace LusDiscordCompanion
         private ListBox lstLog;
         private TextBox txtConfigPath;
         private Button btnOpenConfig;
+        private TextBox txtExePath;
+        private Button btnOpenExe;
         private Panel adBanner;
         private NotifyIcon trayIcon;
         private ContextMenuStrip trayMenu;
@@ -67,6 +69,8 @@ namespace LusDiscordCompanion
             lstLog = new ListBox();
             txtConfigPath = new TextBox();
             btnOpenConfig = new Button();
+            txtExePath = new TextBox();
+            btnOpenExe = new Button();
             adBanner = new Panel();
             trayIcon = new NotifyIcon(components);
             trayMenu = new ContextMenuStrip(components);
@@ -84,8 +88,8 @@ namespace LusDiscordCompanion
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-            layout.RowCount = 9;
-            for (int i = 0; i < 8; i++)
+            layout.RowCount = 10;
+            for (int i = 0; i < 9; i++)
                 layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
 
@@ -143,6 +147,16 @@ namespace LusDiscordCompanion
             layout.SetColumnSpan(txtConfigPath, 2);
             layout.Controls.Add(btnOpenConfig, 3, 4);
 
+            txtExePath.Dock = DockStyle.Fill;
+            txtExePath.ReadOnly = true;
+            btnOpenExe.Text = "Open folder";
+            btnOpenExe.AutoSize = true;
+            btnOpenExe.Click += BtnOpenExe_Click;
+            layout.Controls.Add(FieldLabel("Program file"), 0, 5);
+            layout.Controls.Add(txtExePath, 1, 5);
+            layout.SetColumnSpan(txtExePath, 2);
+            layout.Controls.Add(btnOpenExe, 3, 5);
+
             chkStartup.Text = "Start with Windows";
             chkStartup.AutoSize = true;
             chkTray.Text = "Minimize to tray";
@@ -151,7 +165,7 @@ namespace LusDiscordCompanion
             var optionsRow = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = new Padding(0, 10, 0, 6) };
             optionsRow.Controls.Add(chkStartup);
             optionsRow.Controls.Add(chkTray);
-            layout.Controls.Add(optionsRow, 0, 5);
+            layout.Controls.Add(optionsRow, 0, 6);
             layout.SetColumnSpan(optionsRow, 4);
 
             btnSave.Text = "Save";
@@ -167,17 +181,17 @@ namespace LusDiscordCompanion
             buttonRow.Controls.Add(btnSave);
             buttonRow.Controls.Add(btnTest);
             buttonRow.Controls.Add(btnWatch);
-            layout.Controls.Add(buttonRow, 0, 6);
+            layout.Controls.Add(buttonRow, 0, 7);
             layout.SetColumnSpan(buttonRow, 4);
 
             var activityLabel = FieldLabel("Activity");
-            layout.Controls.Add(activityLabel, 0, 7);
+            layout.Controls.Add(activityLabel, 0, 8);
             layout.SetColumnSpan(activityLabel, 4);
 
             lstLog.Dock = DockStyle.Fill;
             lstLog.IntegralHeight = false;
             lstLog.HorizontalScrollbar = true;
-            layout.Controls.Add(lstLog, 0, 8);
+            layout.Controls.Add(lstLog, 0, 9);
             layout.SetColumnSpan(lstLog, 4);
 
             // Gimmick: fake ad banner along the bottom edge.
@@ -221,8 +235,8 @@ namespace LusDiscordCompanion
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
             Font = SystemFonts.MessageBoxFont;
-            ClientSize = new Size(760, 510);
-            MinimumSize = new Size(640, 430);
+            ClientSize = new Size(760, 540);
+            MinimumSize = new Size(640, 460);
             StartPosition = FormStartPosition.CenterScreen;
             Text = "LUS Discord Companion";
             Controls.Add(layout);
